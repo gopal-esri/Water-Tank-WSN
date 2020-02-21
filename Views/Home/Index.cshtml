@@ -1,0 +1,66 @@
+﻿<br />
+<div class="text-center img-test">
+    <button class="btn-outline-dark rounded" id="label_btn">Print Label</button>
+</div>
+
+<table style="width:100%" id="my-table">
+    <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Age</th>
+    </tr>
+    <tr>
+        <td>Jill</td>
+        <td>Smith</td>
+        <td>50</td>
+    </tr>
+    <tr>
+        <td>Eve</td>
+        <td>Jackson</td>
+        <td>94</td>
+    </tr>
+</table>
+
+@section Scripts {
+
+
+    <script src="~/Scripts/PDF/jspdf.min.js"></script>
+    <script src="~/Scripts/PDF/jspdf.plugin.autotable.js"></script>
+
+    <script type="text/javascript">
+
+        const pdf = new jsPDF({
+            orientation: 'potrait',
+            unit: 'mm',         //Can put 'in' for inches
+            format: [210, 297]   //The size[width,height]
+        });
+        pdf.addFont('times', 'courier');
+        pdf.setFont('times');
+        pdf.setFontSize(11);
+
+
+        // select the button
+        let button1 = document.querySelector('#label_btn');
+
+        // add 'click' event listener for the button
+        button1.addEventListener('click', printPDF);
+
+
+
+        // actual PDF options
+        function printPDF() {
+
+            pdf.autoTable({ html: '#my-table' })
+            pdf.text(20, 48, 'JTC CORPORATION\nTHE JTC SUMMIT\n8 JURONG TOWN HALL ROAD\nSINGAPORE 609434\nATTN: TEH WILKIE');
+            pdf.addPage()
+            pdf.text(30, 30, '(e)')
+
+
+
+            pdf.save("label.pdf");
+        }
+
+
+
+    </script>
+}

@@ -1,0 +1,248 @@
+﻿<br />
+<div class="text-center img-test">
+	<button class="btn-outline-dark rounded" id="label_btn">Print Label</button>
+</div>
+
+
+@section Scripts {
+
+
+	<script src="~/Scripts/PDF/jspdf.min.js"></script>
+	<script src="~/Scripts/PDF/jspdf.plugin.autotable.js"></script>
+
+	<script type="text/javascript">
+
+		const pdf = new jsPDF({
+			orientation: 'potrait',
+			unit: 'mm',         //Can put 'in' for inches
+			format: [210, 297]   //The size[width,height]
+		});
+		pdf.addFont('times', 'courier','helvetica');
+		pdf.setFont('times');
+		pdf.setFontSize(11);
+		pdf.setTextColor(0, 0, 0);
+
+
+
+
+		// select the button
+		let button1 = document.querySelector('#label_btn');
+
+		// add 'click' event listener for the button
+		button1.addEventListener('click', printPDF);
+
+		//
+		var colStyle_Header = {
+			0: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', textColor:0   },
+			1: { lineWidth: 0.1, lineColor: 0, cellWidth: 110, halign: 'center', textColor:0  },
+			2: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', textColor:0   },
+			3: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', textColor:0   },
+			4: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', textColor:0   },
+			5: { lineWidth: 0.1, lineColor: 0, cellWidth: 'auto', halign: 'center', textColor:0   }
+		};
+
+		var colStyle_Body = {
+			0: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0, valign:'middle'  },
+			1: { lineWidth: 0.1, lineColor: 0, cellWidth: 110, halign: 'left' , fontSize : 9, textColor:0, valign:'middle'   },
+			2: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0   },
+			3: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0   },
+			4: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0   },
+			5: { lineWidth: 0.1, lineColor: 0, cellWidth: 'auto', halign: 'center', textColor:0  }
+		};
+
+		var colStyle_SubHeader= {
+			0: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0   },
+			1: { lineWidth: 0.1, lineColor: 0, cellWidth: 110, halign: 'center' , fontSize : 9, textColor:0  },
+			2: { lineWidth: 0.1, lineColor: 0, cellWidth: 36.7, halign: 'center', fontSize : 9, textColor:0   },
+			3: { lineWidth: 0.1, lineColor: 0, cellWidth: 'auto', halign: 'center', textColor:0  }
+		};
+
+		var colStyle_SubHeader2= {
+			0: { lineWidth: 0.1, lineColor: 0, cellWidth: 12, halign: 'center', fontSize : 9, textColor:0   },
+			1: { lineWidth: 0.1, lineColor: 0, cellWidth: 110, halign: 'left' , fontSize : 9, textColor:0  },
+			2: { lineWidth: 0.1, lineColor: 0, cellWidth: 36.7, halign: 'center', fontSize : 9, textColor:0   },
+			3: { lineWidth: 0.1, lineColor: 0, cellWidth: 'auto', halign: 'center', textColor:0  }
+		};
+
+		var table_header = [
+			['S/No', 'DEFECTS', 'LLT', 'ILT', 'HLT', 'REMARKS'],
+		];
+
+		var table_subheader = [
+			['S/No', 'Records', 'Available', 'Not Available'],
+		];
+
+		var header_style = {
+			fillColor: [220, 220, 220], halign: 'center' , textColor:0 
+		};
+
+
+		var body_style = {
+			0: { fillColor: [255, 255, 255]},
+			1: { fillColor: [255, 255, 255]} 
+		};
+
+		var table_security = [
+			['1', 'Access doors not locked', '', '', '', ''],
+			['2', 'Access doors using normal locks', '', '', '', ''],
+			['3', 'Tank cover not lock', '', '', '', ''],
+			['4', 'Tank cover using normal locked', '', '', '', ''],
+			['5', 'Inadequate enclosure', '', '', '', ''],
+			['6', 'Water Tanks not segregated from other services\n(submission after 20 Mar 15)', '', '', '', ''],
+			['7', 'SS bracket not installed', '', '', '', ''],
+			['8', 'SS bracket dislodged', '', '', '', ''],
+			['9', 'SS brackets not installed properly\n(not at the center, not following contour)', '', '', '', ''],
+			['10', 'Tapered round nuts missing or not fully tightened', '', '', '', ''],
+			['11', 'Defective locks', '', '', '', ''],
+			['12', 'Electrode holder not secured to water tank body', '', '', '', ''],
+			['13', 'Key movement book not used for access door to water tank area', '', '', '', ''],
+			['14', 'Same keys used for access door to water tank area and inspection covers', '', '', '', ''],
+
+		];
+
+		var table_maintenance_part1 = [
+			['15', 'Overflow pipe no/ missing/ torn netting', '', '', '', ''],
+			['16', 'Warning pipe no/ missing/ torn netting', '', '', '', ''],
+			['17', 'Air Vent no/ missing/ torn netting', '', '', '', ''],
+			['18', 'Damaged air vent', '', '', '', ''],
+			['19', 'Improper/non-compliant netting \n(not stainless steel or aperture size > 0.65mm)', '', '', '', ''],
+			['20', 'No sampling taps at body/outgoing pipe\n(supply turned on or after 2005)', '', '', '', ''],
+			['21', 'No sampling taps at washout pipe before valve\n(supply turned on or after 2005)', '', '', '', ''],
+		];
+
+		var table_maintenance_part2 = [
+			['22', 'Sampling points not locked', '', '', '', ''],
+			['23', 'Gaps on water tanks surface due to pilot valve', '', '', '', ''],
+			['24', 'Holes or gaps on water tank surface', '', '', '', ''],
+			['25', 'Ladder issues (missing,no backguard, shaky)', '', '', '', ''],
+			['26', 'Leakage', '', '', '', ''],
+			['27', 'Non-portable pipes above water tanks \n(indicate type of pipe under remarks)', '', '', '', ''],
+			['28', 'Water tank area/pump room used as store', '', '', '', ''],
+			['29', 'Tank has excessive sediments', '', '', '', ''],
+			['30', 'Bird droppings surrounding tanks', '', '', '', ''],
+			['31', 'Others (Please specify):', '', '', '', ''],
+		];
+
+		var table_records = [
+			['1', 'Pumps & Valves', ' ', ' '],
+			['2', 'Others (Please specify):', ' ', ' '],
+		];
+
+		function insert_spacer(yCor,title) {
+			pdf.autoTable({
+				theme: 'grid',
+				styles: header_style,
+				startY: yCor,
+				margin: {left:10, right:10},
+				tableLineWidth: 0.4,
+				tableLineColor: 0,
+				body: [
+					[title],
+				],
+			})
+		}
+
+		function insert_table(yCor,content,colStyleType) {
+			pdf.autoTable({
+				theme: 'grid',
+				styles: body_style,
+				columnStyles: colStyleType,
+				margin: { left: 10, right: 10 },
+				tableLineWidth: 0.4,
+				tableLineColor: 0,
+				startY: yCor,
+				body: content,
+			})
+		}
+
+
+		// actual PDF options
+		function printPDF() {
+			var table_position = 74;
+			var table_position_page2 = 30;
+			var cnt_insp_ht = 158;
+			var ack_ht = 190;
+
+			var logo = new Image();
+			logo.src = "@ViewBag.logo";
+			pdf.addImage(logo, 'png', 12, 12);
+
+			//Title
+			pdf.setFontStyle("bold");pdf.setFontSize(12)
+			pdf.text('REPORT ON INSPECTION OF WATER STORAGE TANKS', 105, 31, null, null, 'center');
+			pdf.setFontStyle("normal");pdf.setFontSize(11)
+
+			//Headers
+			pdf.text(20, 38, 'Name of Premise');        pdf.text(58, 38, ': ________________________________________________________________')
+			pdf.text(20, 44, 'Address');                pdf.text(58, 44, ': ________________________________________________________________')
+			pdf.text(20, 50, 'Registered Customer');    pdf.text(58, 50, ': ________________________________________________________________')
+			pdf.text(20, 56, 'Name of LP');             pdf.text(58, 56, ': ____________________________')
+			pdf.text(20, 62, 'Date of Inspection');     pdf.text(58, 62, ': ____________________________')
+			pdf.text(120, 56, 'Date of Last WTIC');     pdf.text(151, 56, ': ________________')
+			pdf.text(126.5, 62, 'Water Turn On');       pdf.text(151, 62, ': ________________')
+
+			//Table
+			pdf.text(10, 72, 'Findings');
+
+			insert_table(table_position,table_header,colStyle_Header); 
+			
+			insert_spacer(table_position + 7,'Water Tank Security');
+
+			insert_table(table_position + 14,table_security,colStyle_Body);
+
+			insert_spacer(table_position + 126, 'Water Tank Maintenance');
+
+			insert_table(table_position + 133, table_maintenance_part1, colStyle_Body);
+
+			pdf.text('Page 1', 105, 282, null, null, 'center');
+			pdf.setTextColor(0, 0, 255); pdf.setFontSize(7);
+			pdf.text(10, 288, '40 Scotts Road #22-01 Environment Building Singapore 228231 \nWebsite: www.pub.gov.sg');
+			
+			pdf.setFontSize(11);
+
+			// New Page
+			pdf.addPage();
+
+			insert_table(table_position_page2,table_header,colStyle_Header);
+
+			insert_table(table_position_page2 + 7, table_maintenance_part2, colStyle_Body);
+
+			insert_table(table_position_page2 + 85, table_subheader, colStyle_SubHeader);
+
+			insert_spacer(table_position_page2 + 92, 'Maintenance Records');
+
+			insert_table(table_position_page2 + 99, table_records, colStyle_SubHeader2);
+
+			// Inspection section
+			pdf.text(20, cnt_insp_ht, 'Inspection carried out by');     pdf.text(65, cnt_insp_ht, ': _____________________');           pdf.text(120, cnt_insp_ht, 'Witnessed by');             pdf.text(150, cnt_insp_ht, ': _____________________');
+			pdf.text(20, cnt_insp_ht + 6, 'Designation');               pdf.text(65, cnt_insp_ht + 6, ': _____________________');       pdf.text(120, cnt_insp_ht + 6, 'Designation');          pdf.text(150, cnt_insp_ht + 6, ': _____________________');
+			pdf.text(20, cnt_insp_ht + 6*2, 'Email');                   pdf.text(65, cnt_insp_ht + 6*2, ': _____________________');     pdf.text(120, cnt_insp_ht + 6*2, 'Email');              pdf.text(150, cnt_insp_ht + 6*2, ': _____________________');
+			pdf.text(20, cnt_insp_ht + 6*3, 'Signature & Date');        pdf.text(65, cnt_insp_ht + 6*3, ': _________________________'); pdf.text(120, cnt_insp_ht + 6*3, 'Signature & Date');   pdf.text(150, cnt_insp_ht + 6*3, ': _____________________');
+
+			//Line
+			pdf.line(10, cnt_insp_ht + 28, 200, cnt_insp_ht + 28);
+
+			//Acknowledgement
+			pdf.text(86, ack_ht + 4, 'ACKNOWLEDGEMENT'); 
+			pdf.setFontSize(10);
+			pdf.text( 'I acknowledge receipt of this report & note that have to rectify the above mentioned defects & engage a licenced water \nservice plumber to inspect & certify the water tanks if necessary or required in order to ensure that the water therein is \nsafe & fit for human consumption immediately. An inspection will be arranged for PUB officers to re-inspect the water \nstorage tanks within 14 days from the date of this notice. I also understand that the above mentioned are in contravention \nof the Public Utilities (Water Supply) Regulations 2002',20, ack_ht + 13, {maxWidth: 170, align: 'justify'});
+			pdf.setFontSize(11);
+			pdf.text(20, ack_ht + 40, 'Name of officer in charge'); pdf.text(65, ack_ht + 40, ': _________________________________________________________________');
+			pdf.text(20, ack_ht + 46, 'Designation');               pdf.text(65, ack_ht + 46, ': _________________________________________________________________');
+			pdf.text(20, ack_ht + 52, 'On behalf of company');      pdf.text(65, ack_ht + 52, ': _________________________________________________________________');
+			pdf.text(20, ack_ht + 58, 'Signature and date');        pdf.text(65, ack_ht + 58, ': _____________________');   pdf.text(120, ack_ht + 58, 'Email');                pdf.text(130.8, ack_ht + 58, ': _______________________________');
+			pdf.text(20, ack_ht + 70, 'Note : Please contact Mr Edros Ismail at Tel No. 68852444 / 96489480 to arrange for a re-inspection upon \nrectification of the above-mentioned non-compliances');
+			pdf.text('Page 2', 105, 282, null, null, 'center');
+
+
+			//Link that lauches email client
+			//pdf.textWithLink('test', 25, 25, { url: 'mailto:test@example.com/' });
+
+			//Save File
+			pdf.save("Inspection Report of Water Storage Tanks (WSN).pdf");
+		}
+
+
+
+	</script>
+}
